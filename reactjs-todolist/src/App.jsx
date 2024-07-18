@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import TodoInput from "./components/TodoInput";
 import TodoList from "./components/TodoList";
 
 function App() {
   const [todos, setTodos] = useState([]);
+  const [todoValue, setTodoValue] = useState("");
 
   function handleAddTodos(newTodo) {
     const newTodoList = [...todos, newTodo];
@@ -16,11 +17,33 @@ function App() {
     });
     setTodos(newTodoList);
   }
-  function handleEditTodos(index) {}
+  function handleEditTodos(index) {
+    const valueToBeEdited = todos[index];
+    setTodoValue(valueToBeEdited);
+    handleDeleteTodos(index);
+  }
+
+  useEffect(() => {
+    if (!localStorage) {
+      return;
+    }
+
+    let localTodos = localStorage.getItem("todos");
+    if (!localTodos) {
+      return;
+    }
+    localTodos = JSON.parse(localTodos).todos;
+    setTodos(localTodos);
+  }, []);
+
   return (
     <>
-      <TodoInput handleAddTodos={handleAddTodos} />
-      <TodoList handleDeleteTodos todos={todos} />
+      <TodoInput
+        todoValue={todoValue}
+        setTodoValue={setTodoValue}
+        handleAddTodos={handleAddTodos}
+      />
+      <TodoList handleDeleteTodos={handleDeleteTodos} todos={todos} />
     </>
   );
 }
